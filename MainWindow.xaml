@@ -1,0 +1,18 @@
+﻿<Window x:Class="WpfApp_Repeat_Test_Test.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp_Repeat_Test_Test"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="550" Width="800">
+    <Grid>
+        <StackPanel Margin="12">
+            <Button x:Name="Btn_Open" Content="连接" Margin="8" Click="Btn_open_Click" FontSize="20" HorizontalAlignment="Right"/>
+            <ListBox x:Name="Lbx_CanFrame"  Width="740" Height="430" FontSize="17"></ListBox>
+        </StackPanel>
+        <!--<Button Content="Button" HorizontalAlignment="Left" Margin="946,-118,-228,0" VerticalAlignment="Top" Width="74"/>-->
+
+
+    </Grid>
+</Window>
