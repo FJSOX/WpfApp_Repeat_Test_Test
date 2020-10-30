@@ -7,7 +7,11 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="550" Width="800">
     <Grid>
-        <StackPanel Margin="12">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="25*"/>
+            <ColumnDefinition Width="47*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Margin="12" Grid.ColumnSpan="2">
             <Button x:Name="Btn_Open" Content="连接" Margin="8" Click="Btn_open_Click" FontSize="20" HorizontalAlignment="Right"/>
             <ListBox x:Name="Lbx_CanFrame"  Width="740" Height="430" FontSize="17"></ListBox>
         </StackPanel>

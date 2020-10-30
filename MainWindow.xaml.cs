@@ -1,4 +1,5 @@
-﻿using System;
+﻿//x64版本
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -40,8 +41,6 @@ namespace WpfApp_Repeat_Test_Test
         public MainWindow()
         {
             InitializeComponent();
-
-            
         }
 
         /// <summary>
@@ -65,6 +64,7 @@ namespace WpfApp_Repeat_Test_Test
                 {
                     MessageBox.Show(("打开设备失败!"), ("警告"),
                         MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    return;
                 }
 
                 VCI_INIT_CONFIG config = new VCI_INIT_CONFIG();//初始化can参数的结构体
@@ -104,17 +104,19 @@ namespace WpfApp_Repeat_Test_Test
                     }
                 }
 
+                //实例化对象
+                timer = new DispatcherTimer();
+                //设置触发时间
+                timer.Interval = TimeSpan.FromSeconds(0.0001);
+                //设置触发事件
+                timer.Tick += timer_Tick;
+                //启动
+                timer.Start();
+
                 //Btn_Connect.Content = "断开";
             }
 
-            //实例化对象
-            timer = new DispatcherTimer();
-            //设置触发时间
-            timer.Interval = TimeSpan.FromSeconds(0.001);
-            //设置触发事件
-            timer.Tick += timer_Tick;
-            //启动
-            timer.Start();
+            
             Btn_Open.Content = mbopen == 1 ? "断开" : "连接";//调节按钮
         }
 
@@ -123,13 +125,14 @@ namespace WpfApp_Repeat_Test_Test
         {
             UInt32 res = new UInt32();
             res = controlCAN.VCI_GetReceiveNum(mdevicetype, mdeviceind, mcanind);
-            if (res == 0)
+            if (res == 0)//res==0，退出，原因未知
                 return;
             //res = VCI_Receive(m_devtype, m_devind, m_canind, ref m_recobj[0],50, 100);
 
             /////////////////////////////////////
             UInt32 con_maxlen = 50;
             IntPtr pt = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(VCI_CAN_OBJ)) * (Int32)con_maxlen);
+            //UInt32 pp = (UInt32)pt;
 
 
 
@@ -140,9 +143,9 @@ namespace WpfApp_Repeat_Test_Test
             String str = "";
             for (UInt32 i = 0; i < res; i++)
             {
-                VCI_CAN_OBJ obj = (VCI_CAN_OBJ)Marshal.PtrToStructure((IntPtr)((UInt32)pt + i * Marshal.SizeOf(typeof(VCI_CAN_OBJ))), typeof(VCI_CAN_OBJ));
+                VCI_CAN_OBJ obj = (VCI_CAN_OBJ)Marshal.PtrToStructure((IntPtr)(pt.ToInt64() + i * Marshal.SizeOf(typeof(VCI_CAN_OBJ))), typeof(VCI_CAN_OBJ));//在x64环境中pt需要通过.ToInt64()转换！
 
-                str = "接收到数据: ";
+                str = "接收到数据: ";         
                 str += "  帧ID:0x" + System.Convert.ToString((Int32)obj.ID, 16);
                 str += "  帧格式:";
                 if (obj.RemoteFlag == 0)
@@ -180,9 +183,22 @@ namespace WpfApp_Repeat_Test_Test
                 }
 
                 Lbx_CanFrame.Items.Add(str);
+                
+                //自动滚动Lbx_CanFrame的滚动条
                 Lbx_CanFrame.SelectedIndex = Lbx_CanFrame.Items.Count - 1;
+                Lbx_CanFrame.SelectionChanged += ListBox_SourceUpdated;
+                //this.Lbx_CanFrame.to = this.listBox1.Items.Count - (int)(this.listBox1.Height / this.listBox1.ItemHeight);
+                //Lbx_CanFrame.SelectedIndex = -1;
             }
             Marshal.FreeHGlobal(pt);
+        }
+
+        //DataSource.CollectionChanged += ListBox_SourceUpdated;
+        private void ListBox_SourceUpdated(object sender, EventArgs e)
+        {
+            Decorator decorator = (Decorator)VisualTreeHelper.GetChild(Lbx_CanFrame, 0);
+            ScrollViewer scrollViewer = (ScrollViewer)decorator.Child;
+            scrollViewer.ScrollToEnd();
         }
 
     }
